@@ -12,6 +12,9 @@ import express from 'express';
 import { v4 as uuidv4 } from 'uuid';
 import db from './database.js';  // ⚠️ Don't forget the .js!
 
+
+
+
 // TODO: Create Express app
 const app = express();
 

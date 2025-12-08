@@ -13,7 +13,17 @@ import { JSONFilePreset } from 'lowdb/node';
 // This is what your database looks like when first created
 // Replace 'yourResource' with your chosen resource name (e.g., tasks, books, movies)
 const defaultData = { 
-  yourResource: [] 
+  students: [
+
+    { id: 1, name: "Cuthbert L", email: "cl@email.com" },
+    { id: 2, name: "John Butler", email: "JB@email.com"},
+    { id: 3, name: "John Thames", email: "JT@email.com"},
+    { id: 4, name: "Curtis Chamberlin", email: "CC@email.com"},
+    { id: 5, name: "Rookie Davenport", email: "RD@email.com" },
+    { id: 6, name: "Wall Banner", email: "WB@email.com"}
+     
+
+    ] 
 };
 
 // TODO: Initialize the database with JSONFilePreset
