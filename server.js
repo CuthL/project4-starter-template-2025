@@ -12,9 +12,6 @@ import express from 'express';
 import { v4 as uuidv4 } from 'uuid';
 import db from './database.js';  // ⚠️ Don't forget the .js!
 
-
-
-
 // TODO: Create Express app
 const app = express();
 
@@ -37,7 +34,6 @@ app.get('/', (req, res) => {
   res.json({ 
     message: 'Welcome to my Project 4 REST API!',
     version: '1.0.0',
-    resource: 'students',
     endpoints: {
       allResources: 'GET /api/resource',
       singleResource: 'GET /api/resource/:id',
@@ -53,17 +49,6 @@ app.get('/', (req, res) => {
 // Replace 'resource' with your chosen resource name!
 // ============================================
 
-function isValidUUID(id, res) {
-  if (!uuidValidate(id)) {
-    res.status(400).json({
-      success: false,
-      message: 'Invalid UUID format'
-    });
-    return false;
-  }
-  return true;
-}
-
 /**
  * GET /api/resource - Get all resources
  * 
@@ -75,17 +60,8 @@ function isValidUUID(id, res) {
  * 4. Send response with status 200 and the data
  * 5. Handle errors with status 500
  */
-
 app.get('/api/resource', async (req, res) => {
-
-
   try {
-    // YOUR CODE HERE
-    // Example:
-    // await db.read();
-    // const items = db.data.yourResource;
-    // res.status(200).json({ success: true, count: items.length, data: items });
-    
     // 1 & 2. Read from the database
     await db.read();
 
@@ -98,10 +74,9 @@ app.get('/api/resource', async (req, res) => {
       count: items.length,
       data: items
     });
-
-    res.status(501).json({ message: 'Not implemented yet - your turn!' });
   } catch (error) {
     console.error('Error in GET /api/resource:', error);
+    // 5. Handle errors
     res.status(500).json({
       success: false,
       message: 'Error retrieving resources',
@@ -125,15 +100,9 @@ app.get('/api/resource', async (req, res) => {
  */
 app.get('/api/resource/:id', async (req, res) => {
   try {
+    // 2. Get id from params
     const { id } = req.params;
-    
-    // YOUR CODE HERE
-    // Example:
-    // await db.read();
-    // const item = db.data.yourResource.find(item => item.id === id);
-    // if (!item) { return res.status(404).json({ success: false, message: 'Not found' }); }
-    // res.status(200).json({ success: true, data: item });
-    
+
     // 3. Read from database
     await db.read();
 
@@ -153,10 +122,9 @@ app.get('/api/resource/:id', async (req, res) => {
       success: true,
       data: item
     });
-
-    res.status(501).json({ message: 'Not implemented yet - your turn!' });
   } catch (error) {
     console.error('Error in GET /api/resource/:id:', error);
+    // 7. Handle errors
     res.status(500).json({
       success: false,
       message: 'Error retrieving resource',
@@ -183,14 +151,6 @@ app.get('/api/resource/:id', async (req, res) => {
  */
 app.post('/api/resource', async (req, res) => {
   try {
-    // YOUR CODE HERE
-    // Example:
-    // const { title, description } = req.body;
-    // if (!title) { return res.status(400).json({ success: false, message: 'Title required' }); }
-    // const newItem = { id: uuidv4(), title, description, createdAt: new Date().toISOString() };
-    // await db.update(({ yourResource }) => yourResource.push(newItem));
-    // res.status(201).json({ success: true, data: newItem });
-    
     // 2. Get data from body
     const { title, description } = req.body;
 
@@ -220,10 +180,9 @@ app.post('/api/resource', async (req, res) => {
       success: true,
       data: newItem
     });
-
-    res.status(501).json({ message: 'Not implemented yet - your turn!' });
   } catch (error) {
     console.error('Error in POST /api/resource:', error);
+    // 7. Handle errors
     res.status(500).json({
       success: false,
       message: 'Error creating resource',
@@ -251,17 +210,9 @@ app.post('/api/resource', async (req, res) => {
  */
 app.put('/api/resource/:id', async (req, res) => {
   try {
+    // 2. Get id
     const { id } = req.params;
-    
-    // YOUR CODE HERE
-    // Example:
-    // await db.read();
-    // const index = db.data.yourResource.findIndex(item => item.id === id);
-    // if (index === -1) { return res.status(404).json({ success: false, message: 'Not found' }); }
-    // db.data.yourResource[index] = { ...db.data.yourResource[index], ...req.body, updatedAt: new Date().toISOString() };
-    // await db.write();
-    // res.status(200).json({ success: true, data: db.data.yourResource[index] });
-    
+
     // 3. Get update data
     const updates = req.body;
 
@@ -294,10 +245,9 @@ app.put('/api/resource/:id', async (req, res) => {
       success: true,
       data: db.data.yourResource[index]
     });
-
-    res.status(501).json({ message: 'Not implemented yet - your turn!' });
   } catch (error) {
     console.error('Error in PUT /api/resource/:id:', error);
+    // 11. Handle errors
     res.status(500).json({
       success: false,
       message: 'Error updating resource',
@@ -322,17 +272,9 @@ app.put('/api/resource/:id', async (req, res) => {
  */
 app.delete('/api/resource/:id', async (req, res) => {
   try {
+    // 2. Get id
     const { id } = req.params;
-    
-    // YOUR CODE HERE
-    // Example:
-    // await db.read();
-    // const index = db.data.yourResource.findIndex(item => item.id === id);
-    // if (index === -1) { return res.status(404).json({ success: false, message: 'Not found' }); }
-    // let deletedItem;
-    // await db.update(({ yourResource }) => { deletedItem = yourResource.splice(index, 1)[0]; });
-    // res.status(200).json({ success: true, data: deletedItem });
-    
+
     // 3. Read DB
     await db.read();
 
@@ -359,10 +301,9 @@ app.delete('/api/resource/:id', async (req, res) => {
       success: true,
       data: deletedItem
     });
-
-    res.status(501).json({ message: 'Not implemented yet - your turn!' });
   } catch (error) {
     console.error('Error in DELETE /api/resource/:id:', error);
+    // 8. Handle errors
     res.status(500).json({
       success: false,
       message: 'Error deleting resource',
