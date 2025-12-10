@@ -37,6 +37,7 @@ app.get('/', (req, res) => {
   res.json({ 
     message: 'Welcome to my Project 4 REST API!',
     version: '1.0.0',
+    resource: 'students',
     endpoints: {
       allResources: 'GET /api/resource',
       singleResource: 'GET /api/resource/:id',
@@ -52,6 +53,17 @@ app.get('/', (req, res) => {
 // Replace 'resource' with your chosen resource name!
 // ============================================
 
+function isValidUUID(id, res) {
+  if (!uuidValidate(id)) {
+    res.status(400).json({
+      success: false,
+      message: 'Invalid UUID format'
+    });
+    return false;
+  }
+  return true;
+}
+
 /**
  * GET /api/resource - Get all resources
  * 
@@ -63,7 +75,10 @@ app.get('/', (req, res) => {
  * 4. Send response with status 200 and the data
  * 5. Handle errors with status 500
  */
+
 app.get('/api/resource', async (req, res) => {
+
+
   try {
     // YOUR CODE HERE
     // Example:
@@ -71,6 +86,19 @@ app.get('/api/resource', async (req, res) => {
     // const items = db.data.yourResource;
     // res.status(200).json({ success: true, count: items.length, data: items });
     
+    // 1 & 2. Read from the database
+    await db.read();
+
+    // 3. Get your resources array
+    const items = db.data.yourResource || [];
+
+    // 4. Send success response
+    res.status(200).json({
+      success: true,
+      count: items.length,
+      data: items
+    });
+
     res.status(501).json({ message: 'Not implemented yet - your turn!' });
   } catch (error) {
     console.error('Error in GET /api/resource:', error);
@@ -106,6 +134,26 @@ app.get('/api/resource/:id', async (req, res) => {
     // if (!item) { return res.status(404).json({ success: false, message: 'Not found' }); }
     // res.status(200).json({ success: true, data: item });
     
+    // 3. Read from database
+    await db.read();
+
+    // 4. Find resource
+    const item = db.data.yourResource.find(item => item.id === id);
+
+    // 5. Not found
+    if (!item) {
+      return res.status(404).json({
+        success: false,
+        message: 'Resource not found'
+      });
+    }
+
+    // 6. Found
+    res.status(200).json({
+      success: true,
+      data: item
+    });
+
     res.status(501).json({ message: 'Not implemented yet - your turn!' });
   } catch (error) {
     console.error('Error in GET /api/resource/:id:', error);
@@ -143,6 +191,36 @@ app.post('/api/resource', async (req, res) => {
     // await db.update(({ yourResource }) => yourResource.push(newItem));
     // res.status(201).json({ success: true, data: newItem });
     
+    // 2. Get data from body
+    const { title, description } = req.body;
+
+    // 3. Validate required field(s)
+    if (!title) {
+      return res.status(400).json({
+        success: false,
+        message: 'Title is required'
+      });
+    }
+
+    // 4. Create new resource
+    const newItem = {
+      id: uuidv4(),
+      title,
+      description: description ?? '',
+      createdAt: new Date().toISOString()
+    };
+
+    // 5. Add to database
+    await db.update(({ yourResource }) => {
+      yourResource.push(newItem);
+    });
+
+    // 6. Return 201
+    res.status(201).json({
+      success: true,
+      data: newItem
+    });
+
     res.status(501).json({ message: 'Not implemented yet - your turn!' });
   } catch (error) {
     console.error('Error in POST /api/resource:', error);
@@ -184,6 +262,39 @@ app.put('/api/resource/:id', async (req, res) => {
     // await db.write();
     // res.status(200).json({ success: true, data: db.data.yourResource[index] });
     
+    // 3. Get update data
+    const updates = req.body;
+
+    // 4. Read DB
+    await db.read();
+
+    // 5. Find index
+    const index = db.data.yourResource.findIndex(item => item.id === id);
+
+    // 6. Not found
+    if (index === -1) {
+      return res.status(404).json({
+        success: false,
+        message: 'Resource not found'
+      });
+    }
+
+    // 7 & 8. Merge + timestamp
+    db.data.yourResource[index] = {
+      ...db.data.yourResource[index],
+      ...updates,
+      updatedAt: new Date().toISOString()
+    };
+
+    // 9. Write to DB
+    await db.write();
+
+    // 10. Return updated
+    res.status(200).json({
+      success: true,
+      data: db.data.yourResource[index]
+    });
+
     res.status(501).json({ message: 'Not implemented yet - your turn!' });
   } catch (error) {
     console.error('Error in PUT /api/resource/:id:', error);
@@ -222,6 +333,33 @@ app.delete('/api/resource/:id', async (req, res) => {
     // await db.update(({ yourResource }) => { deletedItem = yourResource.splice(index, 1)[0]; });
     // res.status(200).json({ success: true, data: deletedItem });
     
+    // 3. Read DB
+    await db.read();
+
+    // 4. Find index
+    const index = db.data.yourResource.findIndex(item => item.id === id);
+
+    // 5. Not found
+    if (index === -1) {
+      return res.status(404).json({
+        success: false,
+        message: 'Resource not found'
+      });
+    }
+
+    let deletedItem;
+
+    // 6. Remove using update + splice
+    await db.update(({ yourResource }) => {
+      deletedItem = yourResource.splice(index, 1)[0];
+    });
+
+    // 7. Return deleted
+    res.status(200).json({
+      success: true,
+      data: deletedItem
+    });
+
     res.status(501).json({ message: 'Not implemented yet - your turn!' });
   } catch (error) {
     console.error('Error in DELETE /api/resource/:id:', error);
