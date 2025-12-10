@@ -35,9 +35,9 @@ app.get('/', (req, res) => {
     message: 'Welcome to my Project 4 REST API!',
     version: '1.0.0',
     endpoints: {
-      allResources: 'GET /api/resource',
-      singleResource: 'GET /api/resource/:id',
-      createResource: 'POST /api/resource',
+      allResources: 'GET /api/students',
+      singleResource: 'GET /api/students/:id',
+      createResource: 'POST /api/students',
       updateResource: 'PUT /api/resource/:id',
       deleteResource: 'DELETE /api/resource/:id'
     }
@@ -60,26 +60,26 @@ app.get('/', (req, res) => {
  * 4. Send response with status 200 and the data
  * 5. Handle errors with status 500
  */
-app.get('/api/resource', async (req, res) => {
+app.get('/api/students', async (req, res) => {
   try {
-    // 1 & 2. Read from the database
+    // 1. Read from the database
     await db.read();
 
-    // 3. Get your resources array
-    const items = db.data.yourResource || [];
+    // 2. Get student array
+    const students = db.data.students || [];
 
-    // 4. Send success response
+    // 3. Return success response
     res.status(200).json({
       success: true,
-      count: items.length,
-      data: items
+      count: students.length,
+      data: students
     });
   } catch (error) {
-    console.error('Error in GET /api/resource:', error);
+    console.error('Error in GET /api/students:', error);
     // 5. Handle errors
     res.status(500).json({
       success: false,
-      message: 'Error retrieving resources',
+      message: 'Error retrieving students',
       error: error.message
     });
   }
@@ -98,24 +98,26 @@ app.get('/api/resource', async (req, res) => {
  * 6. If found, return 200 with the data
  * 7. Handle errors with status 500
  */
-app.get('/api/resource/:id', async (req, res) => {
+app.get('/api/students/:id', async (req, res) => {
   try {
-    // 2. Get id from params
     const { id } = req.params;
 
-    // 3. Read from database
     await db.read();
 
-    // 4. Find resource
-    const item = db.data.yourResource.find(item => item.id === id);
+    // Find the student with matching ID
+    const student = db.data.students.find(s => String(s.id) === String(id));
 
-    // 5. Not found
-    if (!item) {
+    if (!student) {
       return res.status(404).json({
         success: false,
-        message: 'Resource not found'
+        message: 'Student not found'
       });
     }
+
+    res.status(200).json({
+      success: true,
+      data: student
+    });
 
     // 6. Found
     res.status(200).json({
@@ -123,11 +125,11 @@ app.get('/api/resource/:id', async (req, res) => {
       data: item
     });
   } catch (error) {
-    console.error('Error in GET /api/resource/:id:', error);
+    console.error('Error in GET /api/students/:id:', error);
     // 7. Handle errors
     res.status(500).json({
       success: false,
-      message: 'Error retrieving resource',
+      message: 'Error retrieving student',
       error: error.message
     });
   }
@@ -149,43 +151,42 @@ app.get('/api/resource/:id', async (req, res) => {
  * 6. Return 201 with the new resource
  * 7. Handle errors with status 500
  */
-app.post('/api/resource', async (req, res) => {
+app.post('/api/students', async (req, res) => {
   try {
-    // 2. Get data from body
-    const { title, description } = req.body;
+    const { name, email } = req.body;
 
-    // 3. Validate required field(s)
-    if (!title) {
+    // Validation
+    if (!name || !email) {
       return res.status(400).json({
         success: false,
-        message: 'Title is required'
+        message: 'Name and email are required'
       });
     }
 
-    // 4. Create new resource
-    const newItem = {
-      id: uuidv4(),
-      title,
-      description: description ?? '',
+    // Create new student
+    const newStudent = {
+      id: uuidv4(), // generate UUID
+      name,
+      email,
       createdAt: new Date().toISOString()
     };
 
-    // 5. Add to database
-    await db.update(({ yourResource }) => {
-      yourResource.push(newItem);
+    // Save to database
+    await db.update(({ students }) => {
+      students.push(newStudent);
     });
 
-    // 6. Return 201
     res.status(201).json({
       success: true,
-      data: newItem
+      data: newStudent
     });
+
   } catch (error) {
-    console.error('Error in POST /api/resource:', error);
+    console.error('Error in POST /api/students:', error);
     // 7. Handle errors
     res.status(500).json({
       success: false,
-      message: 'Error creating resource',
+      message: 'Error creating students',
       error: error.message
     });
   }
@@ -208,49 +209,43 @@ app.post('/api/resource', async (req, res) => {
  * 10. Return 200 with updated resource
  * 11. Handle errors with status 500
  */
-app.put('/api/resource/:id', async (req, res) => {
+app.put('/api/students/:id', async (req, res) => {
   try {
-    // 2. Get id
     const { id } = req.params;
+    const changes = req.body;
 
-    // 3. Get update data
-    const updates = req.body;
-
-    // 4. Read DB
     await db.read();
 
-    // 5. Find index
-    const index = db.data.yourResource.findIndex(item => item.id === id);
+    // Find student index
+    const index = db.data.students.findIndex(s => String(s.id) === String(id));
 
-    // 6. Not found
     if (index === -1) {
       return res.status(404).json({
         success: false,
-        message: 'Resource not found'
+        message: 'Student not found'
       });
     }
 
-    // 7 & 8. Merge + timestamp
-    db.data.yourResource[index] = {
-      ...db.data.yourResource[index],
-      ...updates,
+    // Update student
+    db.data.students[index] = {
+      ...db.data.students[index],
+      ...changes,
       updatedAt: new Date().toISOString()
     };
 
-    // 9. Write to DB
     await db.write();
 
-    // 10. Return updated
     res.status(200).json({
       success: true,
-      data: db.data.yourResource[index]
+      data: db.data.students[index]
     });
+
   } catch (error) {
-    console.error('Error in PUT /api/resource/:id:', error);
+    console.error('Error in PUT /api/students/:id:', error);
     // 11. Handle errors
     res.status(500).json({
       success: false,
-      message: 'Error updating resource',
+      message: 'Error updating students',
       error: error.message
     });
   }
@@ -270,30 +265,26 @@ app.put('/api/resource/:id', async (req, res) => {
  * 7. Return 200 with deleted resource
  * 8. Handle errors with status 500
  */
-app.delete('/api/resource/:id', async (req, res) => {
+app.delete('/api/students/:id', async (req, res) => {
   try {
-    // 2. Get id
     const { id } = req.params;
 
-    // 3. Read DB
     await db.read();
 
-    // 4. Find index
-    const index = db.data.yourResource.findIndex(item => item.id === id);
+    const index = db.data.students.findIndex(s => String(s.id) === String(id));
 
-    // 5. Not found
     if (index === -1) {
       return res.status(404).json({
         success: false,
-        message: 'Resource not found'
+        message: 'Student not found'
       });
     }
 
-    let deletedItem;
+    let removedStudent;
 
-    // 6. Remove using update + splice
-    await db.update(({ yourResource }) => {
-      deletedItem = yourResource.splice(index, 1)[0];
+    // Remove student
+    await db.update(({ students }) => {
+      removedStudent = students.splice(index, 1)[0];
     });
 
     // 7. Return deleted
