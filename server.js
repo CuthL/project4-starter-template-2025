@@ -74,9 +74,9 @@ app.get('/api/students', async (req, res) => {
       count: students.length,
       data: students
     });
+
   } catch (error) {
     console.error('Error in GET /api/students:', error);
-    // 5. Handle errors
     res.status(500).json({
       success: false,
       message: 'Error retrieving students',
@@ -86,17 +86,7 @@ app.get('/api/students', async (req, res) => {
 });
 
 /**
- * GET /api/resource/:id - Get a single resource by ID
- * 
- * TODO: Implement this endpoint
- * Steps:
- * 1. Use try/catch for error handling
- * 2. Get the id from req.params
- * 3. Read from database
- * 4. Find the resource using .find()
- * 5. If not found, return 404
- * 6. If found, return 200 with the data
- * 7. Handle errors with status 500
+ * GET /api/students/:id - Get a single student
  */
 app.get('/api/students/:id', async (req, res) => {
   try {
@@ -119,14 +109,8 @@ app.get('/api/students/:id', async (req, res) => {
       data: student
     });
 
-    // 6. Found
-    res.status(200).json({
-      success: true,
-      data: item
-    });
   } catch (error) {
     console.error('Error in GET /api/students/:id:', error);
-    // 7. Handle errors
     res.status(500).json({
       success: false,
       message: 'Error retrieving student',
@@ -136,20 +120,7 @@ app.get('/api/students/:id', async (req, res) => {
 });
 
 /**
- * POST /api/resource - Create a new resource
- * 
- * TODO: Implement this endpoint
- * Steps:
- * 1. Use try/catch for error handling
- * 2. Get data from req.body
- * 3. Validate required fields (return 400 if missing)
- * 4. Create new resource object with:
- *    - id: uuidv4()
- *    - your fields from req.body
- *    - createdAt: new Date().toISOString()
- * 5. Add to database using: await db.update(({ yourResource }) => yourResource.push(newItem))
- * 6. Return 201 with the new resource
- * 7. Handle errors with status 500
+ * POST /api/students - Create a new student
  */
 app.post('/api/students', async (req, res) => {
   try {
@@ -183,31 +154,16 @@ app.post('/api/students', async (req, res) => {
 
   } catch (error) {
     console.error('Error in POST /api/students:', error);
-    // 7. Handle errors
     res.status(500).json({
       success: false,
-      message: 'Error creating students',
+      message: 'Error creating student',
       error: error.message
     });
   }
 });
 
 /**
- * PUT /api/resource/:id - Update an existing resource
- * 
- * TODO: Implement this endpoint
- * Steps:
- * 1. Use try/catch for error handling
- * 2. Get id from req.params
- * 3. Get update data from req.body
- * 4. Read database
- * 5. Find the resource index using .findIndex()
- * 6. If not found, return 404
- * 7. Update the resource (merge old and new data with spread operator)
- * 8. Add updatedAt timestamp
- * 9. Write to database: await db.write()
- * 10. Return 200 with updated resource
- * 11. Handle errors with status 500
+ * PUT /api/students/:id - Update a student
  */
 app.put('/api/students/:id', async (req, res) => {
   try {
@@ -242,28 +198,16 @@ app.put('/api/students/:id', async (req, res) => {
 
   } catch (error) {
     console.error('Error in PUT /api/students/:id:', error);
-    // 11. Handle errors
     res.status(500).json({
       success: false,
-      message: 'Error updating students',
+      message: 'Error updating student',
       error: error.message
     });
   }
 });
 
 /**
- * DELETE /api/resource/:id - Delete a resource
- * 
- * TODO: Implement this endpoint
- * Steps:
- * 1. Use try/catch for error handling
- * 2. Get id from req.params
- * 3. Read database
- * 4. Find the resource index using .findIndex()
- * 5. If not found, return 404
- * 6. Remove using db.update() with .splice()
- * 7. Return 200 with deleted resource
- * 8. Handle errors with status 500
+ * DELETE /api/students/:id - Delete a student
  */
 app.delete('/api/students/:id', async (req, res) => {
   try {
@@ -287,17 +231,16 @@ app.delete('/api/students/:id', async (req, res) => {
       removedStudent = students.splice(index, 1)[0];
     });
 
-    // 7. Return deleted
     res.status(200).json({
       success: true,
-      data: deletedItem
+      data: removedStudent
     });
+
   } catch (error) {
-    console.error('Error in DELETE /api/resource/:id:', error);
-    // 8. Handle errors
+    console.error('Error in DELETE /api/students/:id:', error);
     res.status(500).json({
       success: false,
-      message: 'Error deleting resource',
+      message: 'Error deleting student',
       error: error.message
     });
   }

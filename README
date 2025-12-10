@@ -1,0 +1,110 @@
+Open VS Code and go the folder named Project4-starter-template-2025
+
+Run in project folder: 
+npm install
+
+Start the Server
+npm start
+
+You should see:
+🚀 Server running on http://localhost:3000
+📚 Students API is ready!
+
+The API is now live at:
+http://localhost:3000
+
+📚 API Endpoints
+All endpoints use the base route:
+
+/api/students
+GET – Retrieve All Students
+Request:
+GET http://localhost:3000/api/students
+
+Response Example:
+{
+  "success": true,
+  "count": 6,
+  "data": [
+    { "id": 1, "name": "Cuthbert L", "email": "CL@email.com" },
+    ...
+  ]
+}
+
+POST – Create a New Student
+Request:
+POST http://localhost:3000/api/students
+Body (JSON):
+{
+  "name": "New Student",
+  "email": "new@student.com"
+}
+
+Response:
+{
+  "success": true,
+  "data": {
+    "id": "generated-uuid",
+    "name": "New Student",
+    "email": "new@student.com",
+    "createdAt": "2025-02-12T..."
+  }
+}
+
+GET – Retrieve a Student by ID
+Request:
+GET http://localhost:3000/api/students/:id
+
+Example:
+GET http://localhost:3000/api/students/3
+Response (if found):
+{
+  "success": true,
+  "data": {
+    "id": 3,
+    "name": "John Thames",
+    "email": "JT@email.com"
+  }
+}
+
+PUT – Update a Student
+Request:
+PUT http://localhost:3000/api/students/:id
+Body (JSON):
+
+{
+  "email": "updated@student.com"
+}
+Response:
+{
+  "success": true,
+  "data": {
+    "id": 3,
+    "name": "John Thames",
+    "email": "updated@student.com",
+    "updatedAt": "2025-02-12T..."
+  }
+}
+
+DELETE – Remove a Student
+Request:
+DELETE http://localhost:3000/api/students/:id
+Response:
+{
+  "success": true,
+  "data": {
+    "id": 3,
+    "name": "John Thames",
+    "email": "JT@email.com"
+  }
+}
+
+Testing the API with Postman
+-Open Postman Desktop
+-Create a new request
+-Select the appropriate HTTP method (GET, POST, PUT, DELETE)
+-Enter the correct URL
+-For POST & PUT:
+-Click Body → raw → JSON
+-Enter JSON data
+-Click Send
